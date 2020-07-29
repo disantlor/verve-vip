@@ -39,7 +39,7 @@ const Payment = ({ error, draft_order, customer }) => {
 
     const chargeCard = async (event) => {
         fetch(
-            `https://verve-wine-vip.ngrok.io/api/draft_order/${draft_order.id}/complete`,
+            `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
             {
               method: 'POST'
             }
@@ -130,7 +130,7 @@ export async function getServerSideProps(context) {
 
     let data = {}
     try {
-        let res = await fetch(`https://verve-wine-vip.ngrok.io/api/draft_order/${draft_order_id}`)
+        let res = await fetch(`${process.env.BASE_URL}/api/draft_order/${draft_order_id}`)
         data = await res.json()
     } catch (e) {
         console.error("Error fetching draft order information", e.message)

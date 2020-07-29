@@ -20,7 +20,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
     function chargeCard() {
 
       fetch(
-        `https://verve-wine-vip.ngrok.io/api/draft_order/${draft_order.id}/complete`,
+        `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
         {
           method: 'POST'
         }
@@ -46,7 +46,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
       );
     }
 
-    const invoice_url = `https://verve-wine-vip.ngrok.io/order/${draft_order.id}/pay`
+    const invoice_url = `${process.env.BASE_URL}/order/${draft_order.id}/pay`
 
     const rows = draft_order.line_items.map(line => [
       line.title + ' - ' + line.variant_title,
@@ -133,7 +133,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
   
     let data = {}
     try {
-      let res = await fetch(`https://verve-wine-vip.ngrok.io/api/draft_order/${draft_order_id}`)
+      let res = await fetch(`${process.env.BASE_URL}/api/draft_order/${draft_order_id}`)
       data = await res.json()
     } catch (e) {
       console.error("Error fetching draft order information", e.message)
