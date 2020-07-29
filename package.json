@@ -1,0 +1,39 @@
+{
+  "name": "verve-vip",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --ignore 'pages/' server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server.js",
+    "ngrok": "ngrok http 7200 -subdomain=verve-wine-vip"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@shopify/koa-shopify-auth": "^3.1.65",
+    "@shopify/polaris": "^4.26.1",
+    "@stripe/react-stripe-js": "^1.1.2",
+    "@stripe/stripe-js": "^1.8.0",
+    "@zeit/next-css": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "forever": "^3.0.0",
+    "isomorphic-fetch": "^2.2.1",
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^2.5.0",
+    "koa-router": "^9.1.0",
+    "koa-session": "^6.0.0",
+    "moment": "^2.27.0",
+    "next": "^9.4.4",
+    "ramda": "^0.27.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "shopify-api-node": "^3.3.2",
+    "stripe": "^8.69.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
