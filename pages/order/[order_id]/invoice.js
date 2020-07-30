@@ -3,7 +3,7 @@ import { Elements, CardElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
 
-const stripePromise = loadStripe('pk_live_0IcVwoptmNzxJFSsBHnhTVH8');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
 

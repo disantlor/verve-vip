@@ -13,19 +13,28 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 
 
-const stripePromise = loadStripe('pk_live_0IcVwoptmNzxJFSsBHnhTVH8');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
 
 async function getStripeSessionId() {
-    const response = await fetch('/api/draft_order/569485852732/setup-payment');
-    return response.json()
+    try {
+        let response = await fetch('/api/draft_order/569485852732/setup-payment');
+        return response.json()
+    } catch(e) {
+        console.error(e);
+        alert("Something went wrong")
+    }
 }
 
 const Payment = ({ error, draft_order, customer }) => {
     const redirectToStripe = async (event) => {
         // Call your backend to create the Checkout session.
         const { sessionId } = await getStripeSessionId()
+
+        if (! sessionId) {
+            return false;
+        }
 
         // When the customer clicks on the button, redirect them to Checkout.
         const stripe = await stripePromise;

@@ -31,7 +31,7 @@ module.exports = ({ router }) => {
             }
         )
 
-        context.body = 'Sent' 
+        context.body = { success: true }
     })
 
 
@@ -41,7 +41,7 @@ module.exports = ({ router }) => {
         // if no customer, create one
         if (! customer) {
             try {
-                customer = await Stripe.customer.create({
+                customer = await Stripe.customers.create({
                     email: draft_order.email,
                     name: draft_order.customer.first_name + ' ' + draft_order.customer.last_name,
                     metadata: {
@@ -49,36 +49,35 @@ module.exports = ({ router }) => {
                     }
                 })
             } catch (e) {
-                console.error('Could not create Stripe customer for draft order:', draft_order.id)
+                console.error('Could not create Stripe customer for draft order:', e.message, draft_order.id)
                 throw new Error('Customer creation failed. Cannot complete order without valid customer')
             }
-            // update customer record to store strip customer id as tag
+            // update customer record to store strip customer id as tag        
             try {
-                await Shopify.customer.update(
-                    draft_order.customer.id,
-                    {
-                        tags: R.pipe(
-                            R.propOr('', 'tags'),
-                            R.split(','),
-                            R.map(R.trim),
-                            R.append(customer.id),
-                            R.uniq,
-                            R.join(', ')
-                        )(draft_order.customer)
-                    }
-                )
+                let new_tags = R.pipe(
+                    R.propOr('', 'tags'),
+                    R.split(','),
+                    R.map(R.trim),
+                    R.append(customer.id),
+                    R.uniq,
+                    R.join(',')
+                )(draft_order.customer)                
+                 await Shopify.customer.update(draft_order.customer.id, { tags: new_tags })
             } catch (e) {
-                console.error("Failed to record Stripe customer id", draft_order.customer.id, customer.id)
+                console.error("Failed to record Stripe customer id", draft_order.customer.id, customer.id, e.message)
                 throw new Error('Error when recording Stripe customer id')
             }
         }
+
+        // TODO: how to pass error message (like customer might already exist) back to client
+
         // create Stripe session
         let session_params = {
             payment_method_types: ['card'],
             client_reference_id: draft_order.id,
             customer: customer.id,
             mode: 'setup',
-            success_url: `https://verve-wine-vip.ngrok.io.ngrok.io/order/${draft_order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.BASE_URL}/order/${draft_order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: 'https://www.vervewine.com'
         }
         let session = false;

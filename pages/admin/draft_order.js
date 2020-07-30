@@ -85,7 +85,7 @@ class DraftOrder extends React.Component {
 
   }
 
-  render(a, b) {
+  render() {
     let { error, draft_order, customer, loading } = this.state
 
     console.log("loading", loading)
