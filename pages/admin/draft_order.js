@@ -20,7 +20,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
     function chargeCard() {
 
       fetch(
-        `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/complete`,
         {
           method: 'POST'
         }
@@ -46,13 +46,28 @@ const DraftOrder = ({ error, draft_order, customer }) => {
       );
     }
 
-    const invoice_url = `${process.env.BASE_URL}/order/${draft_order.id}/pay`
+    const invoice_url = `${process.env.NEXT_PUBLIC_BASE_URL}/order/${draft_order.id}/pay`
 
     const rows = draft_order.line_items.map(line => [
       line.title + ' - ' + line.variant_title,
       line.quantity,
       line.price
     ])
+
+    let mode = false;
+
+    if (customer && customer.default_source) {
+      mode = 'charge'
+    }
+
+    if (! customer || (customer && ! customer.default_source)) {
+      mode = 'invoice'
+    }
+
+    if (draft_order.status === 'completed') {
+      mode = 'complete'
+    }
+
   
     return (
       <Page fullWidth="true">
@@ -89,7 +104,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
           </Card>
         </Layout.Section>
   
-        {customer && customer.default_source && 
+        {mode === 'charge' &&
           <Layout.Section>
             <PageActions
               primaryAction={{
@@ -105,7 +120,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
           </Layout.Section>
         }
 
-        {(! customer || (customer && ! customer.default_source)) && 
+        {mode === 'invoice' && 
           <Layout.Section>
             <PageActions
               primaryAction={{
@@ -123,6 +138,14 @@ const DraftOrder = ({ error, draft_order, customer }) => {
             />
           </Layout.Section>        
         }
+
+        {mode === 'complete' && 
+          <Layout.Section>
+            <TextContainer>
+              <p>This invoice is already paid</p>
+            </TextContainer>
+          </Layout.Section>        
+        }   
 
       </Page>
     )
