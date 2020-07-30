@@ -41,6 +41,8 @@ class DraftOrder extends React.Component {
 
     this.setState({ loading: true })
 
+    let { draft_order, customer } = this.props
+
     fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/complete`,
       {
@@ -62,6 +64,8 @@ class DraftOrder extends React.Component {
   sendInvoice() {
 
     this.setState({ loading: true })
+
+    let { draft_order, customer } = this.props
 
     fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/send-invoice`,
