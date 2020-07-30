@@ -10,38 +10,81 @@ import {
   PageActions
 } from '@shopify/polaris';
 
-const DraftOrder = ({ error, draft_order, customer }) => {
+import React from 'react'
 
-    console.log("env variables", process.env)
-  
-    function back() {
-      console.log(`https://vervewine.com/admin/draft_orders/${draft_order.id}`)
-      location.href = `https://vervewine.com/admin/draft_orders/${draft_order.id}`
+//const DraftOrder = ({ error, draft_order, customer }) => {
+class DraftOrder extends React.Component {
+
+  constructor(props) {
+    super()
+
+    let { error, draft_order, customer } = props;
+    
+    this.state = {
+      error,
+      draft_order,
+      customer
     }
 
-    function chargeCard() {
+    this.chargeCard = this.chargeCard.bind(this);
+    this.sendInvoice = this.sendInvoice.bind(this);
+  }
 
-      fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/complete`,
-        {
-          method: 'POST'
-        }
-      )
+  back() {
+    console.log(`https://vervewine.com/admin/draft_orders/${draft_order.id}`)
+    location.href = `https://vervewine.com/admin/draft_orders/${draft_order.id}`
+  }
+
+  chargeCard(e) {
+
+    console.log(this, e)
+
+    this.setState({ loading: true })
+
+    fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/complete`,
+      {
+        method: 'POST'
+      }
+    )
       .then(response => response.json())
       .then(response => {
         alert("Success!")
-        console.log("SUCCESS", "redirecting to order...", response.order.id)
+        window.location.reload()
+        //console.log("SUCCESS", "redirecting to order...", response.order.id)
       })
       .catch(error => {
         console.error("Error completeing draft order", error)
       })
 
-    }
+  }
 
-    function sendInvoice() {
+  sendInvoice() {
 
-    }
+    this.setState({ loading: true })
 
+    fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/send-invoice`,
+      {
+        method: 'POST'
+      }
+    )
+      .then(response => response.json())
+      .then(response => {
+        alert("Success!")
+        window.location.reload()
+        //console.log("SUCCESS", "redirecting to order...", response.order.id)
+      })
+      .catch(error => {
+        console.error("Error completeing draft order", error)
+      })
+
+  }
+
+  render(a, b) {
+    let { error, draft_order, customer, loading } = this.state
+
+    console.log("loading", loading)
     if (error) {
       return (
         <div>{error}</div>
@@ -62,7 +105,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
       mode = 'charge'
     }
 
-    if (! customer || (customer && ! customer.default_source)) {
+    if (!customer || (customer && !customer.default_source)) {
       mode = 'invoice'
     }
 
@@ -70,17 +113,17 @@ const DraftOrder = ({ error, draft_order, customer }) => {
       mode = 'complete'
     }
 
-  
+
     return (
       <Page fullWidth="true">
         <Layout.Section>
           <TextContainer>
             <Heading>Draft Order {draft_order.name}</Heading>
             <Subheading>Customer: {draft_order.customer.first_name} {draft_order.customer.last_name}</Subheading>
-            { customer && 
+            {customer &&
               <Badge>Stripe ID: {customer.id}</Badge>
             }
-            {! customer &&
+            {!customer &&
               <TextContainer>
                 <p>This customer does not currently have a record in Stripe. Sending the invoice will setup the Stripe account for all orders going forward.</p>
               </TextContainer>
@@ -89,7 +132,7 @@ const DraftOrder = ({ error, draft_order, customer }) => {
         </Layout.Section>
 
         <Layout.Section>
-          <Card>            
+          <Card>
             <DataTable
               columnContentTypes={[
                 'text',
@@ -105,13 +148,14 @@ const DraftOrder = ({ error, draft_order, customer }) => {
             />
           </Card>
         </Layout.Section>
-  
+
         {mode === 'charge' &&
           <Layout.Section>
             <PageActions
               primaryAction={{
                 content: `Charge Card $${draft_order.total_price}`,
-                onAction: chargeCard
+                onAction: this.chargeCard,
+                loading: loading === true
               }}
               secondaryActions={[
                 {
@@ -122,49 +166,51 @@ const DraftOrder = ({ error, draft_order, customer }) => {
           </Layout.Section>
         }
 
-        {mode === 'invoice' && 
+        {mode === 'invoice' &&
           <Layout.Section>
             <PageActions
               primaryAction={{
                 content: `Send invoice`,
-                onAction: sendInvoice
+                onAction: this.sendInvoice,
+                loading: loading === true
               }}
               secondaryActions={[
                 {
                   content: 'Preview Invoice',
-                  onAction: function() {
+                  onAction: function () {
                     window.open(invoice_url)
                   }
                 },
               ]}
             />
-          </Layout.Section>        
+          </Layout.Section>
         }
 
-        {mode === 'complete' && 
+        {mode === 'complete' &&
           <Layout.Section>
             <TextContainer>
               <p>This invoice is already paid</p>
             </TextContainer>
-          </Layout.Section>        
-        }   
+          </Layout.Section>
+        }
 
       </Page>
     )
   }
-  
-  export async function getServerSideProps(context) {
-    const draft_order_id = context.query.id
-  
-    let data = {}
-    try {
-      let res = await fetch(`${process.env.BASE_URL}/api/draft_order/${draft_order_id}`)
-      data = await res.json()
-    } catch (e) {
-      console.error("Error fetching draft order information", e.message)
-    }
-  
-    return { props: data }
+}
+
+export async function getServerSideProps(context) {
+  const draft_order_id = context.query.id
+
+  let data = {}
+  try {
+    let res = await fetch(`${process.env.BASE_URL}/api/draft_order/${draft_order_id}`)
+    data = await res.json()
+  } catch (e) {
+    console.error("Error fetching draft order information", e.message)
   }
-  
-  export default DraftOrder
+
+  return { props: data }
+}
+
+export default DraftOrder
