@@ -11,6 +11,8 @@ import {
 } from '@shopify/polaris';
 
 const DraftOrder = ({ error, draft_order, customer }) => {
+
+    console.log("env variables", process.env)
   
     function back() {
       console.log(`https://vervewine.com/admin/draft_orders/${draft_order.id}`)
