@@ -103,20 +103,7 @@ class DraftOrder extends React.Component {
       line.price
     ])
 
-    let mode = false;
-
-    if (customer && customer.default_source) {
-      mode = 'charge'
-    }
-
-    if (!customer || (customer && !customer.default_source)) {
-      mode = 'invoice'
-    }
-
-    if (draft_order.status === 'completed') {
-      mode = 'complete'
-    }
-
+    let has_payment_method = customer && customer.default_source 
 
     return (
       <Page fullWidth="true">
@@ -153,44 +140,36 @@ class DraftOrder extends React.Component {
           </Card>
         </Layout.Section>
 
-        {mode === 'charge' &&
+        {draft_order.status !== 'completed' &&
           <Layout.Section>
             <PageActions
-              primaryAction={{
-                content: `Charge Card $${draft_order.total_price}`,
-                onAction: this.chargeCard,
-                loading: loading === true
-              }}
-              secondaryActions={[
+              primaryAction={[
                 {
-                  content: 'Back'
+                  content: `Charge Card $${draft_order.total_price}`,
+                  onAction: this.chargeCard,
+                  loading: loading === true,
+                  disabled: !has_payment_method
                 },
               ]}
-            />
-          </Layout.Section>
-        }
-
-        {mode === 'invoice' &&
-          <Layout.Section>
-            <PageActions
-              primaryAction={{
-                content: `Send invoice`,
-                onAction: this.sendInvoice,
-                loading: loading === true
-              }}
-              secondaryActions={[
+              secondaryActions={[          
+                {
+                  content: `Send invoice`,
+                  onAction: this.sendInvoice,
+                  loading: loading === true,
+                },
                 {
                   content: 'Preview Invoice',
+                  plain: true,
                   onAction: function () {
                     window.open(invoice_url)
                   }
-                },
+                },                     
               ]}
             />
           </Layout.Section>
         }
 
-        {mode === 'complete' &&
+        {draft_order.status === 'completed' &&
           <Layout.Section>
             <TextContainer>
               <p>This invoice is already paid</p>

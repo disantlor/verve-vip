@@ -12,7 +12,7 @@ import {
 
 import { loadStripe } from '@stripe/stripe-js';
 
-
+console.log(process.env.NEXT_PUBLIC_STRIPE_API_KEY, "?", process.env.STRIPE_API_KEY)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
