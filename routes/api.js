@@ -80,6 +80,7 @@ module.exports = ({ router }) => {
             success_url: `${process.env.BASE_URL}/order/${draft_order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: 'https://www.vervewine.com'
         }
+        
         let session = false;
 
         try {

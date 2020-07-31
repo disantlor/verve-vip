@@ -17,9 +17,9 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
 
-async function getStripeSessionId() {
+async function getStripeSessionId(draft_order_id) {
     try {
-        let response = await fetch('/api/draft_order/569485852732/setup-payment');
+        let response = await fetch(`/api/draft_order/${draft_order_id}/setup-payment`);
         return response.json()
     } catch(e) {
         console.error(e);
@@ -30,7 +30,7 @@ async function getStripeSessionId() {
 const Payment = ({ error, draft_order, customer }) => {
     const redirectToStripe = async (event) => {
         // Call your backend to create the Checkout session.
-        const { sessionId } = await getStripeSessionId()
+        const { sessionId } = await getStripeSessionId(draft_order.id)
 
         if (! sessionId) {
             return false;
