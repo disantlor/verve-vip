@@ -45,6 +45,8 @@ class Payment extends React.Component {
     }
 
     async redirectToStripe() {
+        this.setState({ loading: true })
+
         const { draft_order } = this.props;
         const { sessionId } = await getStripeSessionId(draft_order.id)
         if (!sessionId) {
@@ -58,6 +60,8 @@ class Payment extends React.Component {
     }
 
     chargeCard() {
+        this.setState({ loading: true })
+        
         const { draft_order } = this.props;
         fetch(
             `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
@@ -154,6 +158,7 @@ class Payment extends React.Component {
                                     content: has_payment_method
                                         ? `Complete Payment`
                                         : `Add Payment Method`,
+                                    loading: loading === true,
                                     onAction: has_payment_method
                                         ? this.chargeCard
                                         : this.redirectToStripe
