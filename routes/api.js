@@ -48,6 +48,7 @@ module.exports = ({ router }) => {
                         shopify_customer_id: draft_order.customer.id
                     }
                 })
+                console.log("Created new stripe customer", customer)
             } catch (e) {
                 console.error('Could not create Stripe customer for draft order:', e.message, draft_order.id)
                 throw new Error('Customer creation failed. Cannot complete order without valid customer')
@@ -77,8 +78,8 @@ module.exports = ({ router }) => {
             client_reference_id: draft_order.id,
             customer: customer.id,
             mode: 'setup',
-            success_url: `${process.env.BASE_URL}/order/${draft_order.id}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: 'https://www.vervewine.com'
+            success_url: `${process.env.BASE_URL}/order/${draft_order.id}/pay?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.BASE_URL}/order/${draft_order.id}/pay`
         }
         
         let session = false;

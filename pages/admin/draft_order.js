@@ -35,9 +35,7 @@ class DraftOrder extends React.Component {
     location.href = `https://vervewine.com/admin/draft_orders/${draft_order.id}`
   }
 
-  chargeCard(e) {
-
-    console.log(this, e)
+  chargeCard() {
 
     this.setState({ loading: true })
 
@@ -136,6 +134,8 @@ class DraftOrder extends React.Component {
                 'Price',
               ]}
               rows={rows}
+              showTotalsInFooter='true'
+              totals={['', '', draft_order.total_price]}
             />
           </Card>
         </Layout.Section>

@@ -11,8 +11,8 @@ import {
 } from '@shopify/polaris';
 
 import { loadStripe } from '@stripe/stripe-js';
+import React from 'react'
 
-console.log(process.env.NEXT_PUBLIC_STRIPE_API_KEY, "?", process.env.STRIPE_API_KEY)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
@@ -21,116 +21,152 @@ async function getStripeSessionId(draft_order_id) {
     try {
         let response = await fetch(`/api/draft_order/${draft_order_id}/setup-payment`);
         return response.json()
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         alert("Something went wrong")
     }
 }
 
-const Payment = ({ error, draft_order, customer }) => {
-    const redirectToStripe = async (event) => {
-        // Call your backend to create the Checkout session.
-        const { sessionId } = await getStripeSessionId(draft_order.id)
+class Payment extends React.Component {
 
-        if (! sessionId) {
-            return false;
+    constructor(props) {
+        super()
+
+        let { error, draft_order, customer } = props;
+
+        this.state = {
+            error,
+            draft_order,
+            customer
         }
 
-        // When the customer clicks on the button, redirect them to Checkout.
+        this.redirectToStripe = this.redirectToStripe.bind(this);
+        this.chargeCard = this.chargeCard.bind(this);
+    }
+
+    async redirectToStripe() {
+        const { draft_order } = this.props;
+        const { sessionId } = await getStripeSessionId(draft_order.id)
+        if (!sessionId) {
+            alert("Something went wrong")
+            return false;
+        }
         const stripe = await stripePromise;
         const { error } = await stripe.redirectToCheckout({
             sessionId,
         });
-        // If `redirectToCheckout` fails due to a browser or network
-        // error, display the localized error message to your customer
-        // using `error.message`.
-    };
+    }
 
-    const chargeCard = async (event) => {
+    chargeCard() {
+        const { draft_order } = this.props;
         fetch(
             `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
             {
-              method: 'POST'
+                method: 'POST'
             }
-          )
-          .then(response => response.json())
-          .then(response => {
-            alert("Success!")
-            console.log("SUCCESS", "redirecting to order...", response.order.id)
-          })
-          .catch(error => {
-            console.error("Error completeing draft order", error)
-          })
-    
+        )
+            .then(response => response.json())
+            .then(response => {
+                alert("Success!")
+                console.log("SUCCESS", "redirecting to order...", response.order.id)
+            })
+            .catch(error => {
+                console.error("Error completeing draft order", error)
+            })
+
     }
 
-    const rows = draft_order.line_items.map(line => [
-        line.title + ' - ' + line.variant_title,
-        line.quantity,
-        line.price
-    ])
+    render() {
+        let { error, draft_order, customer, loading } = this.state;
 
-    return (
-        <Page>
-            <Layout>
-                <Layout.Section>
-                    <TextContainer>
-                        <Heading>Verve Wine</Heading>
-                    </TextContainer>
-                </Layout.Section>
+        if (error) {
+            return (
+                <Page>
+                    <Layout>
+                        <Layout.Section>
+                            <TextContainer>{error}</TextContainer>
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            )
+        }
 
-                <Layout.Section>
-                    <p>
-                        More content goes here
-                    </p>
-                </Layout.Section>
+        const rows = draft_order.line_items.map(line => [
+            line.title + ' - ' + line.variant_title,
+            line.quantity,
+            line.price
+        ])
 
-                <Layout.Section>
-                    <Card>
-                        <DataTable
-                            columnContentTypes={[
-                                'text',
-                                'numeric',
-                                'numeric',
-                            ]}
-                            headings={[
-                                'Items in Order',
-                                'Quantity',
-                                'Price',
-                            ]}
-                            rows={rows}
-                        />
-                    </Card>
-                </Layout.Section>
+        let has_payment_method = customer && customer.default_source 
 
-                {(! customer || (customer && ! customer.default_source)) && 
+        return (
+            <Page>
+                <Layout>
                     <Layout.Section>
                         <TextContainer>
-                            <p>You will be redirected to Stripe to securely enter and store your credit card information. This card will be used for this and future orders.</p>
+                            <Heading>Verve Wine Invoice {draft_order.name}</Heading>
                         </TextContainer>
-                        <PageActions
-                            primaryAction={{
-                                content: `Enter Credit Card`,
-                                onAction: redirectToStripe
-                            }}
-                        />
                     </Layout.Section>
-                }
 
-                {customer && customer.default_source &&
                     <Layout.Section>
-                        <PageActions
-                            primaryAction={{
-                                content: `Pay`,
-                                onAction: chargeCard
-                            }}
-                        />
+                        <p>Customer: {draft_order.customer.first_name} {draft_order.customer.last_name}</p>
                     </Layout.Section>
-                }       
 
-            </Layout>
-        </Page>
-    );
+                    <Layout.Section>
+                        <Card>
+                            <DataTable
+                                columnContentTypes={[
+                                    'text',
+                                    'numeric',
+                                    'numeric',
+                                ]}
+                                headings={[
+                                    'Items in Order',
+                                    'Quantity',
+                                    'Price',
+                                ]}
+                                rows={rows}
+                                showTotalsInFooter='true'
+                                totals={['', '', draft_order.total_price]}
+                            />
+                        </Card>
+                    </Layout.Section>
+
+                    {draft_order.status === 'completed' &&
+                        <Layout.Section>
+                            <TextContainer>
+                                 <p>Paid, thank you!</p>
+                            </TextContainer>
+                        </Layout.Section>        
+                    }
+
+                    {draft_order.status !== 'completed' &&
+                        <Layout.Section>
+                            
+                            { ! has_payment_method && 
+                                <TextContainer>
+                                    <p>To complete your order, add a payment method via the button below. We will save your card on file for future orders.</p>
+                                </TextContainer>
+                            }
+                            
+                            <PageActions
+                                primaryAction={{
+                                    content: has_payment_method
+                                        ? `Complete Payment`
+                                        : `Add Payment Method`,
+                                    onAction: has_payment_method
+                                        ? this.chargeCard
+                                        : this.redirectToStripe
+                                }}
+                            />
+                        </Layout.Section>
+                    }
+
+                </Layout>
+            </Page>
+        );
+    }
+
 }
 
 

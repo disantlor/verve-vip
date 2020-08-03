@@ -3,6 +3,11 @@ const moment = require('moment')
 const VIP = require('../lib/VIP')
 const Shopify = require('../lib/Shopify')
 
+
+// TODO:
+// WEBHOOK APPROACH DEPRECATED IN FAVOR OF 2-step "add card" then "complete payment" flow
+// Code left here for reference
+
 module.exports = ({ router }) => {
 
     router.get(
