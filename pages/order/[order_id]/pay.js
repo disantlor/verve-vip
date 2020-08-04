@@ -19,7 +19,7 @@ const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
 
 async function getStripeSessionId(draft_order_id) {
     try {
-        let response = await fetch(`/api/draft_order/${draft_order_id}/setup-payment`);
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order_id}/setup-payment`);
         return response.json()
     } catch (e) {
         console.error(e);
@@ -64,7 +64,7 @@ class Payment extends React.Component {
         
         const { draft_order } = this.props;
         fetch(
-            `${process.env.BASE_URL}/api/draft_order/${draft_order.id}/complete`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/draft_order/${draft_order.id}/complete`,
             {
                 method: 'POST'
             }
