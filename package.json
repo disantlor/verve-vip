@@ -33,7 +33,5 @@
     "shopify-api-node": "^3.3.2",
     "stripe": "^8.69.0"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  }
+  "devDependencies": {}
 }

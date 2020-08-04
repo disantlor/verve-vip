@@ -101,7 +101,7 @@ class Payment extends React.Component {
             line.price
         ])
 
-        let has_payment_method = customer && customer.default_source 
+        let has_payment_method = customer && customer.has_payment_method 
 
         return (
             <Page>
