@@ -72,7 +72,8 @@ class Payment extends React.Component {
             .then(response => response.json())
             .then(response => {
                 alert("Success!")
-                console.log("SUCCESS", "redirecting to order...", response.order.id)
+                window.location.reload()
+                //console.log("SUCCESS", "redirecting to order...", response.order.id)
             })
             .catch(error => {
                 console.error("Error completeing draft order", error)
