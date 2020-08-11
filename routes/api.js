@@ -27,7 +27,8 @@ module.exports = ({ router }) => {
         await Shopify.draftOrder.sendInvoice(
             context.params.draft_order_id,
             {
-                custom_message: `Pay here: ${process.env.BASE_URL}/order/${draft_order_id}/pay`
+                //from: 'privateclient@vervewine.com',
+                custom_message: `${process.env.BASE_URL}/order/${draft_order_id}/pay`
             }
         )
 
