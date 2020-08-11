@@ -150,14 +150,20 @@ class Payment extends React.Component {
                             
                             { ! has_payment_method && 
                                 <TextContainer>
-                                    <p>To complete your order, add a payment method via the button below. We will save your card on file for future orders.</p>
+                                    <p style={{ textAlign: "right", paddingBottom: "20px" }}>To complete your order, add a payment method via the button below. We will save your card on file for future orders.</p>
+                                </TextContainer>
+                            }
+
+                            { has_payment_method && 
+                                <TextContainer>
+                                    <p style={{ textAlign: "right", paddingBottom: "20px" }}>We will charge your card on file. To change payment methods email us at <a href="mailto:privateclient@vervewine.com">privateclient@vervewine.com</a>.</p>
                                 </TextContainer>
                             }
                             
                             <PageActions
                                 primaryAction={{
                                     content: has_payment_method
-                                        ? `Complete Payment`
+                                        ? `Submit Order`
                                         : `Add Payment Method`,
                                     loading: loading === true,
                                     onAction: has_payment_method
