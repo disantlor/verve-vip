@@ -102,6 +102,22 @@ class Payment extends React.Component {
             line.price
         ])
 
+        if (draft_order.shipping_line) {
+            rows.push([
+                `Shipping: ${draft_order.shipping_line.title}`,
+                '',
+                draft_order.shipping_line.price
+            ])
+        }
+
+        if (draft_order.applied_discount) {
+            rows.push([
+                `Discounts:`,
+                '',
+                draft_order.applied_discount.amount
+            ])
+        }
+
         let has_payment_method = customer && customer.has_payment_method 
 
         return (
@@ -140,7 +156,7 @@ class Payment extends React.Component {
                     {draft_order.status === 'completed' &&
                         <Layout.Section>
                             <TextContainer>
-                                 <p>Paid, thank you!</p>
+                                 <p>Paid, thank you!<br/><a href="https://www.vervewine.com">Continue shopping on Verve Wine</a></p>
                             </TextContainer>
                         </Layout.Section>        
                     }
