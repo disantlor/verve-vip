@@ -43,7 +43,7 @@ app.prepare().then(() => {
       );
 
     // FIXME: apply only to UI pages / API
-    //server.use(verifyRequest());
+    server.use(verifyRequest());
 
     server.use(bodyParser());
 
