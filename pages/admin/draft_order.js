@@ -47,15 +47,16 @@ class DraftOrder extends React.Component {
         method: 'POST'
       }
     )
-      .then(response => response.json())
       .then(response => {
         alert("Success!")
         window.location.reload()
         //console.log("SUCCESS", "redirecting to order...", response.order.id)
       })
       .catch(error => {
-        console.error("Error completeing draft order", error)
+        alert(error)
+        console.error("Error completing draft order", error)
       })
+
 
   }
 
@@ -86,7 +87,6 @@ class DraftOrder extends React.Component {
   render() {
     let { error, draft_order, customer, loading } = this.state
 
-    console.log("loading", loading)
     if (error) {
       return (
         <div>{error}</div>

@@ -16,8 +16,12 @@ module.exports = ({ router }) => {
     })
 
     router.post('/api/draft_order/:draft_order_id/complete', async (context) => {
-        let order = await VIP.completeDraftOrder(context.params.draft_order_id)
-        context.body = { order } 
+        try {
+            let order = await VIP.completeDraftOrder(context.params.draft_order_id)
+            context.body = { order } 
+        } catch(error) {
+            context.throw(400, 'Something went wrong');
+        }
     })
 
     router.post('/api/draft_order/:draft_order_id/send-invoice', async (context) => {
