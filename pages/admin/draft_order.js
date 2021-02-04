@@ -47,10 +47,10 @@ class DraftOrder extends React.Component {
         method: 'POST'
       }
     )
-      .then(response => {
-        alert("Success!")
+      .then(response => response.text())
+      .then(async response => {
+        alert(response)
         window.location.reload()
-        //console.log("SUCCESS", "redirecting to order...", response.order.id)
       })
       .catch(error => {
         alert(error)

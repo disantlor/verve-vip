@@ -69,9 +69,12 @@ class Payment extends React.Component {
                 method: 'POST'
             }
         )
-            .then(response => response.json())
             .then(response => {
-                alert("Success!")
+                if (response.status === 200) {
+                    alert("Success!")
+                } else {
+                    alert("Error completing payment. Charge likely denied by bank. Please contact privateclient@vervewine.com for help.")
+                }
                 window.location.reload()
                 //console.log("SUCCESS", "redirecting to order...", response.order.id)
             })
