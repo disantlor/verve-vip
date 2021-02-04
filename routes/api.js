@@ -36,6 +36,20 @@ module.exports = ({ router }) => {
             }
         )
 
+        await Shopify.draftOrder.update(
+            context.params.draft_order_id,
+            {
+                tags: R.pipe(
+                    R.propOr('', 'tags'),
+                    R.split(','),
+                    R.map(R.trim),
+                    R.append('Verve VIP'),
+                    R.uniq,
+                    R.join(', ')
+                )(draft_order)
+            }
+        )
+
         context.body = { success: true }
     })
 
