@@ -49,7 +49,7 @@ class DraftOrder extends React.Component {
     )
       .then(response => response.text())
       .then(async response => {
-        alert(response)
+        //alert(response)
         window.location.reload()
       })
       .catch(error => {
